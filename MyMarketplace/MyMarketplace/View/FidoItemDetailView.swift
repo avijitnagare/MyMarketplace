@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct FidoItemDetailView: View {
     
@@ -16,7 +17,7 @@ struct FidoItemDetailView: View {
     init(item: FidoItem) {
         detailViewModel = FidoItemDetailViewModel(item: item)
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: Constants.size12) {
             imageView
@@ -28,7 +29,7 @@ struct FidoItemDetailView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle(detailViewModel.item.name ?? "Unknown Item")
+        .navigationTitle(detailViewModel.item.name ?? Constants.unknownItem)
     }
     private var itemFavoriteView: some View {
         HStack(spacing: Constants.size8) {
@@ -43,7 +44,28 @@ struct FidoItemDetailView: View {
         }
     }
     private var imageView: some View {
-        Text("Show image here")
+        WebImage(
+            url: URL(string: detailViewModel.item.imageUrl ?? ""),
+            context: [
+                .imageThumbnailPixelSize: CGSize(width: Constants.size200, height: Constants.size200),
+                .queryCacheType: SDImageCacheType.all.rawValue            // Ensures it checks Disk + Memory
+            ]
+        ) { image in
+            image
+                .resizable()
+                .scaledToFit() // Prevents squishing dog photos
+        } placeholder: {
+            // Show this while downloading
+            ZStack {
+                Color.gray.opacity(0.1)
+            }
+        }
+        .onSuccess { image, data, cacheType in
+            // This proves the cache is working!
+            print("Loaded from: \(cacheType == .disk ? "Disk" : "Network/Memory")")
+        }
+        .indicator(.activity)
+        .transition(.fade(duration: 0.3))
     }
     
     func toggleFavoriteAndSync() {

@@ -17,6 +17,7 @@ struct Constants {
     
     //MARK: - UI Constants
     static let addItemText = "Add Item"
+    static let unknownItem = "Unknown Item"
     
     
     //MARK: - Image names
