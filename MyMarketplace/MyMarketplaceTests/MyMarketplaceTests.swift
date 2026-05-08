@@ -6,31 +6,35 @@
 //
 
 import XCTest
+import SwiftData
+
 @testable import MyMarketplace
 
 final class MyMarketplaceTests: XCTestCase {
 
+    var viewModel: FidoMainViewModel?
+    var dataManager: DataManager?
+    var container: ModelContainer?
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        container = try? ModelContainer(for: FidoItem.self, configurations: config)
+        
+        // Initialize DataManager manually
+        dataManager = DataManager(container: container!)
+        viewModel = FidoMainViewModel(dataManager: dataManager!)
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        dataManager = nil
+        container = nil
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    func testViewModelTitles() throws {
+        XCTAssertEqual(viewModel?.addItemTitle, "Add Item")
+        XCTAssertEqual(viewModel?.navTitle, "Marketplace")
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
+   
 
 }
