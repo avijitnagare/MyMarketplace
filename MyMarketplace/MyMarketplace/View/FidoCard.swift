@@ -62,28 +62,36 @@ struct FidoCard: View {
     }
     @ViewBuilder
     private var mainViewImage: some View {
-        WebImage(
-            url: URL(string: item.imageUrl ?? ""),
-            context: [
-                .imageThumbnailPixelSize: CGSize(width: Constants.size200, height: Constants.size200),
-                .queryCacheType: SDImageCacheType.all.rawValue            // Ensures it checks Disk + Memory
-            ]
-        ) { image in
-            image
-                .resizable()
-                .scaledToFit() // Prevents squishing dog photos
-        } placeholder: {
-            // Show this while downloading
-            ZStack {
-                Color.gray.opacity(0.1)
+        if item.photoData != nil {
+            if let uiImage = UIImage(data: item.photoData!) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
             }
+        } else {
+            WebImage(
+                url: URL(string: item.imageUrl ?? ""),
+                context: [
+                    .imageThumbnailPixelSize: CGSize(width: Constants.size200, height: Constants.size200),
+                    .queryCacheType: SDImageCacheType.all.rawValue            // Ensures it checks Disk + Memory
+                ]
+            ) { image in
+                image
+                    .resizable()
+                    .scaledToFit() // Prevents squishing dog photos
+            } placeholder: {
+                // Show this while downloading
+                ZStack {
+                    Color.gray.opacity(0.1)
+                }
+            }
+            .onSuccess { image, data, cacheType in
+                // This proves the cache is working!
+                print("Loaded from: \(cacheType == .disk ? "Disk" : "Network/Memory")")
+            }
+            .indicator(.activity)
+            .transition(.fade(duration: 0.3))
         }
-        .onSuccess { image, data, cacheType in
-            // This proves the cache is working!
-            print("Loaded from: \(cacheType == .disk ? "Disk" : "Network/Memory")")
-        }
-        .indicator(.activity)
-        .transition(.fade(duration: 0.3))
         
     }
 }
