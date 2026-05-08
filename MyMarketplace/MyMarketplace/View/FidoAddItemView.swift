@@ -124,6 +124,9 @@ struct FidoAddItemView: View {
                         fido.serverId = item?.serverId
                         do {
                             try dataManager.saveIfNeeded()
+                            DispatchQueue.main.async {
+                                ToastManager.shared.show(text: "Item: \(nameText) successfully created on server!!")
+                            }
                         } catch {
                             print("Failed to update syncStatus after successful POST: \(error)")
                         }
