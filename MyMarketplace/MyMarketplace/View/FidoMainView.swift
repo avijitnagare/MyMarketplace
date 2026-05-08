@@ -10,10 +10,17 @@ import SwiftData
 
 struct FidoMainView: View {
     
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [FidoItem]
+    @Environment(DataManager.self) private var dataManager
+       
+    @Query(sort: \FidoItem.timestamp, order: .reverse) private var items: [FidoItem]
     
-    @StateObject var mainViewModel = FidoMainViewModel()
+    
+    @StateObject var mainViewModel: FidoMainViewModel
+    init(dataManager: DataManager) {
+        _mainViewModel = StateObject(wrappedValue: FidoMainViewModel(dataManager: dataManager))
+    }
+    
+    @State private var showingAdd = false
     
     let column = [
         GridItem(.adaptive(minimum: Constants.size200), spacing: Constants.size8)
@@ -21,32 +28,46 @@ struct FidoMainView: View {
     
     var body: some View {
         NavigationSplitView {
-            LazyVGrid(columns: column) {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
+            ZStack {
+                mainContentView
             }
             .navigationTitle(mainViewModel.navTitle)
             .toolbar {
                 ToolbarItem {
-                    Button(action: addItem) {
+                    Button {
+                        showingAdd = true
+                    } label: {
                         Label(Constants.addItemText, systemImage: Constants.imageNamePlus)
                     }
+                }
+            }
+            .onAppear() {
+                Task {
+                    await mainViewModel.getAllFidos()
                 }
             }
         } detail: {
             Text("Select an item")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = FidoItem()
-            modelContext.insert(newItem)
+        .sheet(isPresented: $showingAdd) {
+            
         }
     }
+    
+    private var mainContentView: some View {
+        ScrollView {
+            LazyVGrid(columns: column) {
+                ForEach(items) { item in
+                    NavigationLink {
+                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                    } label: {
+                        Text("\(item.name)")
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(Constants.size12)
+        }
+    }
+
 }
