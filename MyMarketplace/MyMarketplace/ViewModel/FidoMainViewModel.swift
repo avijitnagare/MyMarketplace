@@ -43,11 +43,31 @@ class FidoMainViewModel: ObservableObject {
             for currentItem in items {
                 dataManager.modelContext.insert(currentItem)
             }
+        } else if (EnvironmentManager.shared.isMock) {
+            print("Continue with local only data")
         } else {
             //2. Online: Update with server
             // A. create new record which are not at local or update server data to local
-            
-            
+            for serverItem in items {
+                if let existingLocalItem = getIfLocallyExist(localId: serverItem.localId) {
+                    //Update existing
+                    existingLocalItem.serverId = serverItem.serverId
+                    existingLocalItem.name = serverItem.name
+                    existingLocalItem.favorite = serverItem.favorite
+                    existingLocalItem.imageUrl = serverItem.imageUrl
+                    existingLocalItem.itemDescription = serverItem.itemDescription
+                    existingLocalItem.syncStatus = true
+                    print("Updated existing localId: \(serverItem.localId)")
+                    
+                } else {
+                    //Insert new
+                    serverItem.localId = UUID().uuidString
+                    serverItem.timestamp = Date()
+                    dataManager.modelContext.insert(serverItem)
+                    //Sync localId to server
+                    print("Inserted new server item with localId: \(serverItem.localId) and serverId: \(serverItem.serverId)")
+                }
+            }
         }
         
         do {
@@ -55,8 +75,31 @@ class FidoMainViewModel: ObservableObject {
         } catch {
             print("Failed to save after upsert: \(error)")
         }
-       
+        
     }
+    
+    func getIfLocallyExist(localId: String?) -> FidoItem? {
+        guard let localId else { return nil }
+        
+        let predicate = #Predicate<FidoItem> { item in
+            item.localId == localId
+        }
+        
+        var descriptor = FetchDescriptor<FidoItem>(predicate: predicate)
+        descriptor.fetchLimit = 1
+        
+        do {
+            // 1. Use .fetch instead of .fetchCount
+            let results = try dataManager.modelContext.fetch(descriptor)
+            
+            // 2. Return the first item in the array (if it exists)
+            return results.first
+        } catch {
+            print("Error fetching local item: \(error)")
+            return nil
+        }
+    }
+    
     
     func isAlreadyFidoInDatabase() -> Bool {
         let descriptor = FetchDescriptor<FidoItem>()
