@@ -35,6 +35,16 @@ final class MyMarketplaceTests: XCTestCase {
         XCTAssertEqual(viewModel?.navTitle, "Marketplace")
     }
 
-   
+   func testIfViewModelIsNotNil() {
+        XCTAssertNotNil(viewModel)
+    }
+    
+    func testIsAlreadyFidoInDatabase() {
+        XCTAssertEqual(viewModel?.isAlreadyFidoInDatabase(), false)
+    }
+    
+    func testGetIfLocallyExist() {
+        XCTAssertEqual(viewModel?.getIfLocallyExist(localId: "123"), nil)
+    }
 
 }
