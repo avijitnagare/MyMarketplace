@@ -106,6 +106,36 @@ struct FidoAddItemView: View {
         fido.photoData = profileImage?.jpegData(compressionQuality: 0.8)
         dataManager.insertNewItem(item: fido)
         
+        do {
+            try dataManager.saveIfNeeded()
+        } catch {
+            print("Failed to save locally: \(error)")
+            // Even if this fails, dismissing may be undesirable; you could show an alert instead.
+            // For now, we’ll still dismiss to match existing UX.
+        }
+        
+        // If online, try to sync immediately; otherwise leave it for background sync
+        if FidoNetworkManager.shared.isInternetAvailable() {
+            Task {
+                let item = await APIService.shared.addFidoItem(fido, isPost: true)
+                if item != nil {
+                    await MainActor.run {
+                        fido.syncStatus = true
+                        fido.serverId = item?.serverId
+                        do {
+                            try dataManager.saveIfNeeded()
+                        } catch {
+                            print("Failed to update syncStatus after successful POST: \(error)")
+                        }
+                    }
+                } else {
+                    // Keep syncStatus = false; background sync will retry later
+                    print("Immediate POST failed; will retry when online.")
+                }
+            }
+        } else {
+            ToastManager.shared.show(text: "Saved offline: \(nameText)")
+        }
         dismiss()
     }
 }
