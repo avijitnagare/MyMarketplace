@@ -71,6 +71,7 @@ struct FidoItemDetailView: View {
     func toggleFavoriteAndSync() {
         detailViewModel.item.favorite.toggle()
         do {
+            detailViewModel.item.isOffLineChanges = true
             try dataManager.saveIfNeeded()
         } catch {
             // Revert if local save fails
@@ -78,6 +79,21 @@ struct FidoItemDetailView: View {
             print("Failed to save favorite toggle locally: \(error)")
             return
         }
+        // Sync to backend with PUT
+        Task {
+            let fido = await APIService.shared.addFidoItem(detailViewModel.item, isPost: false)
+            if fido != nil {
+                await MainActor.run {
+                    detailViewModel.item.favorite = fido?.favorite ?? false
+                    do {
+                        try dataManager.saveIfNeeded()
+                    } catch {
+                        print("Failed to revert favorite after server error: \(error)")
+                    }
+                }
+            }
+        }
+        
     }
     
 }

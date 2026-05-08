@@ -19,6 +19,7 @@ final class FidoItem: Codable {
     @Attribute(.unique) var localId: String?
     @Attribute(.externalStorage) var photoData: Data?
     var serverId: Int?
+    var isOffLineChanges: Bool = false
     
     init() {
         self.timestamp = Date()

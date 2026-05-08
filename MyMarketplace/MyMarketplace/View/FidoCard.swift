@@ -13,6 +13,8 @@ struct FidoCard: View {
     
     var item: FidoItem
     
+    var onFavoriteTapped: ((FidoItem) -> Void)? = nil
+    
     var body: some View {
         VStack(alignment: .leading, spacing: Constants.size8) {
             mainViewImage
@@ -46,7 +48,7 @@ struct FidoCard: View {
     private var heartAndLabelView: some View {
         HStack(spacing: Constants.size8) {
             Button {
-                //TODO: - Toggle action
+                onFavoriteTapped?(item)
             } label: {
                 Image(systemName: item.favorite ? "heart.fill" : "heart")
                     .foregroundStyle(item.favorite ? .red : .secondary)
