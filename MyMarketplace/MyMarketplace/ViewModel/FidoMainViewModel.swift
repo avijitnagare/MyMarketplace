@@ -41,6 +41,8 @@ class FidoMainViewModel: ObservableObject {
         //1. Offline/MOCK: 1. Avoid duplicate
         if !isAlreadyFidoInDatabase() && (EnvironmentManager.shared.isMock || !FidoNetworkManager.shared.isInternetAvailable()) {
             for currentItem in items {
+                currentItem.localId = UUID().uuidString
+                currentItem.timestamp = Date()
                 dataManager.modelContext.insert(currentItem)
             }
         } else if (EnvironmentManager.shared.isMock) {
