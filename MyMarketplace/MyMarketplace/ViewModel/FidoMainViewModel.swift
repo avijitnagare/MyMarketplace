@@ -64,8 +64,10 @@ class FidoMainViewModel: ObservableObject {
                     serverItem.localId = UUID().uuidString
                     serverItem.timestamp = Date()
                     dataManager.modelContext.insert(serverItem)
-                    //Sync localId to server
-                    print("Inserted new server item with localId: \(serverItem.localId) and serverId: \(serverItem.serverId)")
+                    Task {
+                       let fido = await apiService.addFidoItem(serverItem, isPost: false)
+                        print("Inserted new server item with localId: \(fido?.localId) and serverId: \(fido?.serverId)")
+                    }
                 }
             }
         }

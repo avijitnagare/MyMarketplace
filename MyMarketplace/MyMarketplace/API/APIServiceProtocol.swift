@@ -9,6 +9,7 @@ import Foundation
 
 protocol APIServiceProtocol {
     func callApiWith<Model: Decodable>(model: Model.Type, completion: @escaping (Result<Model, Error>) -> Void)
+    func addFidoItem(_ item: FidoItem, isPost: Bool) async -> FidoItem?
 }
 
 typealias APIParseResponse = (response: AnyObject, error: Error?)

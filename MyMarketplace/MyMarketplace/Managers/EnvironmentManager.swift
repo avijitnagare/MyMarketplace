@@ -7,5 +7,5 @@
 
 class EnvironmentManager {
    static let shared = EnvironmentManager()
-   var isMock = true
+   var isMock = false
 }
