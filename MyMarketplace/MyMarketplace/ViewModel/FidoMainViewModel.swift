@@ -38,15 +38,31 @@ class FidoMainViewModel: ObservableObject {
     }
     
     private func upsert(items: [FidoItem]) {
-           for currentItem in items {
-               dataManager.modelContext.insert(currentItem)
-           }
-           do {
-               try dataManager.saveIfNeeded()
-           } catch {
-               print("Failed to save after upsert: \(error)")
-           }
-       }
+        //1. Offline/MOCK: 1. Avoid duplicate
+        if !isAlreadyFidoInDatabase() && (EnvironmentManager.shared.isMock || !FidoNetworkManager.shared.isInternetAvailable()) {
+            for currentItem in items {
+                dataManager.modelContext.insert(currentItem)
+            }
+        } else {
+            //2. Online: Update with server
+        }
+        
+        do {
+            try dataManager.saveIfNeeded()
+        } catch {
+            print("Failed to save after upsert: \(error)")
+        }
+       
+    }
+    
+    func isAlreadyFidoInDatabase() -> Bool {
+        let descriptor = FetchDescriptor<FidoItem>()
+        // We only need to know if ONE exists, so we fetch with a limit of 1
+        var descriptorWithLimit = descriptor
+        descriptorWithLimit.fetchLimit = 1
+        let count = (try? dataManager.modelContext.fetch(descriptorWithLimit).count) ?? 0
+        return count > 0
+    }
 }
 
 extension FidoMainViewModel {
