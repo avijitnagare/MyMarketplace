@@ -89,9 +89,6 @@ extension DataManager {
                 if item.isOffLineChanges {
                     item.isOffLineChanges = false
                 }
-                DispatchQueue.main.async {
-                    ToastManager.shared.show(text: "Item: \(String(describing: item.name ?? "")) synced to server successfully!!!")
-                }
                 do {
                     try modelContext.save()
                 } catch {
