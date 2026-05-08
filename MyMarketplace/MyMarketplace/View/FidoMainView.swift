@@ -8,13 +8,20 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct FidoMainView: View {
+    
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @Query private var items: [FidoItem]
+    
+    @StateObject var mainViewModel = FidoMainViewModel()
+    
+    let column = [
+        GridItem(.adaptive(minimum: Constants.size200), spacing: Constants.size8)
+    ]
+    
     var body: some View {
         NavigationSplitView {
-            List {
+            LazyVGrid(columns: column) {
                 ForEach(items) { item in
                     NavigationLink {
                         Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
@@ -22,15 +29,12 @@ struct ContentView: View {
                         Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
+            .navigationTitle(mainViewModel.navTitle)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
                     Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                        Label(Constants.addItemText, systemImage: Constants.imageNamePlus)
                     }
                 }
             }
@@ -41,21 +45,8 @@ struct ContentView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = Item(timestamp: Date())
+            let newItem = FidoItem(timestamp: Date())
             modelContext.insert(newItem)
         }
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

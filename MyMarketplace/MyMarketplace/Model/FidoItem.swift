@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class Item {
+final class FidoItem {
     var timestamp: Date
     
     init(timestamp: Date) {

@@ -12,7 +12,7 @@ import SwiftData
 struct MyMarketplaceApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            FidoItem.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct MyMarketplaceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            FidoMainView()
         }
         .modelContainer(sharedModelContainer)
     }
