@@ -23,7 +23,7 @@ struct FidoMainView: View {
     @State private var showingAdd = false
     
     let column = [
-        GridItem(.adaptive(minimum: Constants.size200), spacing: Constants.size8)
+        GridItem(.adaptive(minimum: 160), spacing: Constants.size8)
     ]
     
     var body: some View {
@@ -65,7 +65,7 @@ struct FidoMainView: View {
                     NavigationLink {
                         FidoItemDetailView(item: item)
                     } label: {
-                        Text("\(item.name)")
+                        FidoCard(item: item)
                     }
                     .buttonStyle(.plain)
                 }
