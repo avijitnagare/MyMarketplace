@@ -45,7 +45,7 @@ struct FidoMainView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = FidoItem(timestamp: Date())
+            let newItem = FidoItem()
             modelContext.insert(newItem)
         }
     }

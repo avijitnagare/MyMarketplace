@@ -12,7 +12,15 @@ import SwiftData
 final class FidoItem {
     var timestamp: Date
     
-    init(timestamp: Date) {
-        self.timestamp = timestamp
+    var name: String?
+    var favorite: Bool = false
+    var itemDescription: String?
+    var imageUrl: String?
+    var syncStatus: Bool = false
+    @Attribute(.unique) var localId: String
+    
+    init() {
+        self.timestamp = Date()
+        self.localId = UUID().uuidString
     }
 }
