@@ -9,6 +9,8 @@ import SwiftUI
 
 struct FidoItemDetailView: View {
     
+    @Environment(DataManager.self) private var dataManager: DataManager
+    
     var detailViewModel: FidoItemDetailViewModel
     
     init(item: FidoItem) {
@@ -45,7 +47,15 @@ struct FidoItemDetailView: View {
     }
     
     func toggleFavoriteAndSync() {
-        // TODO: - Add favorite action
+        detailViewModel.item.favorite.toggle()
+        do {
+            try dataManager.saveIfNeeded()
+        } catch {
+            // Revert if local save fails
+            detailViewModel.item.favorite.toggle()
+            print("Failed to save favorite toggle locally: \(error)")
+            return
+        }
     }
     
 }
