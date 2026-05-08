@@ -63,7 +63,7 @@ struct FidoMainView: View {
             LazyVGrid(columns: column) {
                 ForEach(items) { item in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        FidoItemDetailView(item: item)
                     } label: {
                         Text("\(item.name)")
                     }
