@@ -17,6 +17,7 @@ final class FidoItem: Codable {
     var imageUrl: String?
     var syncStatus: Bool = false
     @Attribute(.unique) var localId: String?
+    @Attribute(.externalStorage) var photoData: Data?
     var serverId: Int?
     
     init() {
@@ -24,6 +25,16 @@ final class FidoItem: Codable {
         self.localId = UUID().uuidString
     }
     
+    init(timestamp: Date, name: String? = nil, favorite: Bool = false, itemDescription: String, imageUrl: String, photoData: Data? = nil, serverId: Int? = nil) {
+        self.timestamp = timestamp
+        self.name = name
+        self.favorite = favorite
+        self.itemDescription = itemDescription
+        self.imageUrl = imageUrl
+        self.photoData = photoData
+        self.serverId = serverId
+    }
+
     enum CodingKeys: String, CodingKey {
         case localId, name, favorite, itemDescription, imageUrl, syncStatus, serverId
     }

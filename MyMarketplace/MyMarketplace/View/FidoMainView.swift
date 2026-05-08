@@ -54,7 +54,7 @@ struct FidoMainView: View {
             Text("Select an item")
         }
         .sheet(isPresented: $showingAdd) {
-            
+            FidoAddItemView().environment(dataManager)
         }
     }
     
