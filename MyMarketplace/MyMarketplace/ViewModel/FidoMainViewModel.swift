@@ -15,18 +15,24 @@ class FidoMainViewModel: ObservableObject {
     
     private let dataManager: DataManager
     
+    @Published var isLoading = false
+    
     init(dataManager: DataManager, apiService: APIServiceProtocol = APIService()) {
         self.apiService = apiService
         self.dataManager = dataManager
     }
     
     func getAllFidos() async {
+        isLoading = true
         apiService.callApiWith(model: [FidoItem].self) { [weak self] result in
-            switch result {
-            case .success(let fidos):
-                self?.upsert(items: fidos)
-            case .failure(let error):
-                print(error)
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success(let fidos):
+                    self?.upsert(items: fidos)
+                case .failure(let error):
+                    print(error)
+                }
             }
         }
     }

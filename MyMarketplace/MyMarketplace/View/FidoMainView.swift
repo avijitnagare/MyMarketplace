@@ -30,6 +30,10 @@ struct FidoMainView: View {
         NavigationSplitView {
             ZStack {
                 mainContentView
+                    .opacity(mainViewModel.isLoading ? 0.4 : 1.0)
+                if mainViewModel.isLoading {
+                    showProgressView
+                }
             }
             .navigationTitle(mainViewModel.navTitle)
             .toolbar {
@@ -70,4 +74,10 @@ struct FidoMainView: View {
         }
     }
 
+    private var showProgressView: some View {
+        ProgressView("Fetching items...")
+            .padding()
+            .background(.ultraThinMaterial)
+            .cornerRadius(Constants.size8)
+    }
 }
