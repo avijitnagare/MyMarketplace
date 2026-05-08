@@ -31,7 +31,7 @@ class FidoMainViewModel: ObservableObject {
                 case .success(let fidos):
                     self?.upsert(items: fidos)
                 case .failure(let error):
-                    print(error)
+                    print(error)//Show default loaded data
                 }
             }
         }
@@ -45,6 +45,9 @@ class FidoMainViewModel: ObservableObject {
             }
         } else {
             //2. Online: Update with server
+            // A. create new record which are not at local or update server data to local
+            
+            
         }
         
         do {
